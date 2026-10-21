@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel — Açaí do Guri</title>
+<link rel="stylesheet" href="/painel.css">
+<link rel="icon" href="/uploads/seed-logo.png">
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginView" class="login-wrap">
+  <form id="loginForm" class="login-card">
+    <img src="/uploads/seed-logo.png" alt="Açaí do Guri" class="login-logo" onerror="this.style.display='none'">
+    <h1>Painel da Loja</h1>
+    <p class="login-sub">Entre para gerenciar pedidos e cardápio</p>
+    <label>Usuário
+      <input type="text" id="loginUser" autocomplete="username" placeholder="Seu usuário" required>
+    </label>
+    <label>Senha
+      <input type="password" id="loginPass" autocomplete="current-password" placeholder="Sua senha" required>
+    </label>
+    <div id="loginErro" class="erro hidden"></div>
+    <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+  </form>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="appView" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <img id="sideLogo" src="/uploads/seed-logo.png" alt="" onerror="this.style.display='none'">
+      <div>
+        <div id="sideNome" class="brand-nome">Açaí do Guri</div>
+        <div class="brand-sub">Painel da empresa</div>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <button class="menu-item active" data-view="pedidos">🧾 Pedidos <span id="badgeNovos" class="badge-count hidden">0</span></button>
+      <button class="menu-item" data-view="cardapio">🍧 Cardápio</button>
+      <button class="menu-item" data-view="grupos">🧩 Grupos e Opções</button>
+      <button class="menu-item" data-view="bairros">🛵 Bairros e Taxas</button>
+
+      <button class="menu-item menu-acc" id="accRecebBtn" aria-expanded="false">💳 Meios de Recebimento <span class="acc-arrow">▸</span></button>
+      <div class="submenu" id="accReceb">
+        <button class="menu-item menu-sub" data-view="rec-presencial">Presencial</button>
+        <button class="menu-item menu-sub" data-view="rec-mp">Mercado Pago</button>
+        <button class="menu-item menu-sub" data-view="rec-asaas">Asaas</button>
+      </div>
+
+      <button class="menu-item" data-view="loja">🏪 Loja e Aparência</button>
+      <button class="menu-item" data-view="relatorio">📊 Relatório do Dia</button>
+      <button class="menu-item" data-view="financeiro">💰 Financeiro</button>
+      <button class="menu-item" data-view="configuracoes">⚙️ Configurações</button>
+    </nav>
+
+    <div class="side-footer">
+      <div class="side-user">👤 <span id="userNome">—</span></div>
+      <button class="btn btn-ghost btn-sm" id="btnTrocarSenha">Trocar senha</button>
+      <button class="btn btn-ghost btn-sm" id="btnSair">Sair</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <h2 id="viewTitle">Pedidos</h2>
+      <div class="top-actions">
+        <div id="saudeBox" class="saude" title="Estado das integrações"></div>
+        <div class="loja-ctrl">
+          <label class="switch-wrap">
+            <span id="lblAberta">Loja aberta</span>
+            <span class="switch"><input type="checkbox" id="toggleAberta"><span class="slider"></span></span>
+          </label>
+          <div class="pausar-wrap">
+            <button class="btn btn-warn btn-sm" id="btnPausar">⏸ Pausar</button>
+            <div class="pausar-menu hidden" id="pausarMenu">
+              <button data-min="15">Pausar por 15 min</button>
+              <button data-min="30">Pausar por 30 min</button>
+              <button data-min="60">Pausar por 60 min</button>
+            </div>
+          </div>
+          <button class="btn btn-ok btn-sm hidden" id="btnReabrir">▶ Reabrir</button>
+          <span id="pausaInfo" class="pausa-info"></span>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- PEDIDOS -->
+      <section id="view-pedidos" class="view">
+        <div class="toolbar">
+          <label class="chk"><input type="checkbox" id="filtroAguardando"> Só aguardando pagamento</label>
+          <span class="toolbar-info" id="pedidosInfo"></span>
+          <button class="btn btn-ghost btn-sm" id="btnAtualizarPedidos">↻ Atualizar</button>
+        </div>
+        <div class="board" id="board"></div>
+        <div id="pedidosVazio" class="vazio hidden">Nenhum pedido hoje ainda. Quando um cliente pedir, ele aparece aqui com som de alerta. 🔔</div>
+      </section>
+
+      <!-- CARDÁPIO -->
+      <section id="view-cardapio" class="view hidden">
+        <div class="alerta-exemplo">⚠️ Itens de exemplo — edite ou substitua pelo cardápio real da loja. Tudo que você salvar aqui aparece na página de pedidos na hora.</div>
+
+        <div class="bloco">
+          <div class="bloco-head">
+            <h3>Categorias</h3>
+            <button class="btn btn-primary btn-sm" id="btnNovaCategoria">+ Nova categoria</button>
+          </div>
+          <div id="categoriasList" class="chips-list"></div>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-head">
+            <h3>Produtos</h3>
+            <div class="bloco-tools">
+              <input type="search" id="buscaProduto" placeholder="🔎 Buscar produto...">
+              <button class="btn btn-primary btn-sm" id="btnNovoProduto">+ Novo produto</button>
+            </div>
+          </div>
+          <div id="produtosList" class="produtos-list"></div>
+        </div>
+      </section>
+
+      <!-- GRUPOS E OPÇÕES -->
+      <section id="view-grupos" class="view hidden">
+        <div class="bloco-head">
+          <h3>Grupos de opções</h3>
+          <button class="btn btn-primary btn-sm" id="btnNovoGrupo">+ Novo grupo</button>
+        </div>
+        <p class="dica">Grupos são as perguntas do montador: tamanho, acompanhamentos, adicionais, calda... Vincule os grupos aos produtos na edição do produto (Cardápio).</p>
+        <div id="gruposList"></div>
+      </section>
+
+      <!-- BAIRROS -->
+      <section id="view-bairros" class="view hidden">
+        <div class="bloco-head">
+          <h3>Bairros atendidos e taxas de entrega</h3>
+          <button class="btn btn-primary btn-sm" id="btnNovoBairro">+ Novo bairro</button>
+        </div>
+        <div id="bairrosList"></div>
+      </section>
+
+      <!-- RECEBIMENTOS: PRESENCIAL -->
+      <section id="view-rec-presencial" class="view hidden">
+        <h3 class="view-h">Meios de Recebimento — Presencial</h3>
+        <p class="dica">Formas cobradas na entrega ou na retirada. Só o que estiver ligado aparece no checkout do cliente.</p>
+
+        <form class="card-form" id="formPixPresencial">
+          <div class="form-row between">
+            <div><strong>Pix na entrega</strong><div class="dica">Cliente paga por Pix ao receber.</div></div>
+            <span class="switch"><input type="checkbox" id="pixPresAtivo"><span class="slider"></span></span>
+          </div>
+          <label>Chave Pix da loja
+            <input type="text" id="pixPresChave" placeholder="CPF, e-mail, telefone ou chave aleatória">
+          </label>
+          <button type="submit" class="btn btn-primary">Salvar Pix presencial</button>
+        </form>
+
+        <form class="card-form" id="formCartaoPresencial">
+          <div class="form-row between">
+            <div><strong>Cartão na entrega</strong><div class="dica">Maquininha do entregador / balcão.</div></div>
+            <span class="switch"><input type="checkbox" id="cartaoPresAtivo"><span class="slider"></span></span>
+          </div>
+          <button type="submit" class="btn btn-primary">Salvar Cartão presencial</button>
+        </form>
+
+        <form class="card-form" id="formDinheiro">
+          <div class="form-row between">
+            <div><strong>Dinheiro</strong><div class="dica">Pagamento em espécie na entrega/retirada.</div></div>
+            <span class="switch"><input type="checkbox" id="dinheiroAtivo"><span class="slider"></span></span>
+          </div>
+          <label class="chk"><input type="checkbox" id="dinheiroTroco"> Aceita troco (cliente informa "troco para quanto")</label>
+          <button type="submit" class="btn btn-primary">Salvar Dinheiro</button>
+        </form>
+      </section>
+
+      <!-- RECEBIMENTOS: MERCADO PAGO -->
+      <section id="view-rec-mp" class="view hidden">
+        <h3 class="view-h">Meios de Recebimento — Mercado Pago (online)</h3>
+        <p class="dica">Pix e cartão online via API do Mercado Pago. As credenciais ficam salvas só no servidor e são mostradas mascaradas — deixe o campo como está para manter a credencial atual.</p>
+        <form class="card-form" id="formMP">
+          <div class="form-row between">
+            <div><strong>Ativar Mercado Pago</strong><div class="dica">Oferece Pix MP e Cartão MP no checkout.</div></div>
+            <span class="switch"><input type="checkbox" id="mpAtivo"><span class="slider"></span></span>
+          </div>
+          <label>Ambiente
+            <select id="mpAmbiente">
+              <option value="sandbox">Sandbox (testes)</option>
+              <option value="producao">Produção (valendo)</option>
+            </select>
+          </label>
+          <label>Access Token
+            <input type="password" id="mpAccessToken" autocomplete="off" placeholder="">
+          </label>
+          <label>Public Key
+            <input type="password" id="mpPublicKey" autocomplete="off" placeholder="">
+          </label>
+          <label>Webhook Secret (assinatura secreta)
+            <input type="password" id="mpWebhookSecret" autocomplete="off" placeholder="">
+          </label>
+          <label>URL do webhook (cole no painel do Mercado Pago)
+            <span class="copy-row">
+              <input type="text" id="mpWebhookUrl" readonly>
+              <button type="button" class="btn btn-ghost btn-sm" data-copy="mpWebhookUrl">Copiar</button>
+            </span>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar Mercado Pago</button>
+            <button type="button" class="btn btn-ghost" id="btnTestarMP">Testar conexão</button>
+            <span id="mpTesteResult" class="teste-result"></span>
+          </div>
+        </form>
+      </section>
+
+      <!-- RECEBIMENTOS: ASAAS -->
+      <section id="view-rec-asaas" class="view hidden">
+        <h3 class="view-h">Meios de Recebimento — Asaas (online)</h3>
+        <p class="dica">Pix e cartão online via API do Asaas. As credenciais ficam salvas só no servidor e são mostradas mascaradas — deixe o campo como está para manter a credencial atual.</p>
+        <form class="card-form" id="formAsaas">
+          <div class="form-row between">
+            <div><strong>Ativar Asaas</strong><div class="dica">Oferece Pix Asaas e Cartão Asaas no checkout.</div></div>
+            <span class="switch"><input type="checkbox" id="asaasAtivo"><span class="slider"></span></span>
+          </div>
+          <label>Ambiente
+            <select id="asaasAmbiente">
+              <option value="sandbox">Sandbox (testes)</option>
+              <option value="producao">Produção (valendo)</option>
+            </select>
+          </label>
+          <label>API Key
+            <input type="password" id="asaasApiKey" autocomplete="off" placeholder="">
+          </label>
+          <label>Token do Webhook
+            <input type="password" id="asaasWebhookToken" autocomplete="off" placeholder="">
+          </label>
+          <label>URL do webhook (cole no painel do Asaas)
+            <span class="copy-row">
+              <input type="text" id="asaasWebhookUrl" readonly>
+              <button type="button" class="btn btn-ghost btn-sm" data-copy="asaasWebhookUrl">Copiar</button>
+            </span>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar Asaas</button>
+            <button type="button" class="btn btn-ghost" id="btnTestarAsaas">Testar conexão</button>
+            <span id="asaasTesteResult" class="teste-result"></span>
+          </div>
+        </form>
+      </section>
+
+      <!-- LOJA E APARÊNCIA -->
+      <section id="view-loja" class="view hidden">
+        <h3 class="view-h">Loja e Aparência</h3>
+        <form class="card-form" id="formLoja">
+          <div class="uploads-row">
+            <div class="upload-box">
+              <span class="upload-titulo">Logo da loja</span>
+              <img id="logoPreview" class="upload-preview logo" alt="">
+              <label class="btn btn-ghost btn-sm upload-btn">Enviar logo<input type="file" id="fileLogo" accept="image/*" hidden></label>
+              <input type="hidden" id="lojaLogoUrl">
+            </div>
+            <div class="upload-box">
+              <span class="upload-titulo">Foto de capa</span>
+              <img id="capaPreview" class="upload-preview capa" alt="">
+              <label class="btn btn-ghost btn-sm upload-btn">Enviar capa<input type="file" id="fileCapa" accept="image/*" hidden></label>
+              <input type="hidden" id="lojaCapaUrl">
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <label>Nome da loja <input type="text" id="lojaNome" required></label>
+            <label>WhatsApp da loja <input type="text" id="lojaWhatsapp" placeholder="5547999999999"></label>
+            <label>Instagram <input type="text" id="lojaInstagram" placeholder="@acaidoguri.bc"></label>
+            <label>Endereço (texto) <input type="text" id="lojaEndereco" placeholder="Rua..., bairro — cidade"></label>
+            <label>Tempo de preparo (min) <input type="number" id="lojaTempoPreparo" min="0"></label>
+            <label>Tempo de entrega (min) <input type="number" id="lojaTempoEntrega" min="0"></label>
+            <label>Pedido mínimo (R$) <input type="text" id="lojaPedidoMinimo" class="money" inputmode="numeric" placeholder="0,00"></label>
+            <label>Taxa única de entrega (R$) <input type="text" id="lojaTaxaUnica" class="money" inputmode="numeric" placeholder="Vazio = taxa por bairro"></label>
+            <label>Chave Pix exibida no checkout <input type="text" id="lojaChavePix"></label>
+            <label>Horário que abre <input type="time" id="lojaAbre"></label>
+            <label>Horário que fecha <input type="time" id="lojaFecha"></label>
+          </div>
+          <label class="chk"><input type="checkbox" id="lojaAbertaManual"> Loja aberta (interruptor manual — fora do horário ela fecha sozinha)</label>
+          <div class="som-config">
+            <label>🔔 Som de novo pedido
+              <span class="som-row">
+                <select id="lojaSom">
+                  <option value="padrao">Padrão do sistema (bipes altos)</option>
+                  <option value="alerta-sis.mp3">Alerta SIS</option>
+                  <option value="msn-nudges-2002-2005.mp3">MSN Nudge (2002–2005) 🕹️</option>
+                  <option value="vo-vender-de-novo-essa-peste.mp3">“Vou vender de novo essa peste” 😂</option>
+                  <option value="nao-da-atencao.mp3">“Não dá atenção”</option>
+                  <option value="buenas-tche.mp3">“Buenas, tchê!”</option>
+                  <option value="nheco-vari-nheco-fu.mp3">“Nheco vari nheco fu”</option>
+                </select>
+                <button type="button" class="btn btn-ghost btn-sm" id="btnTestarSom">▶ Ouvir</button>
+              </span>
+            </label>
+            <p class="campo-dica">O som toca alto e repete enquanto houver pedido novo na tela — um clique em qualquer lugar silencia. Escolha o toque e clique em Salvar loja.</p>
+          </div>
+          <button type="submit" class="btn btn-primary">Salvar loja</button>
+        </form>
+      </section>
+
+      <!-- RELATÓRIO -->
+      <section id="view-relatorio" class="view hidden">
+        <h3 class="view-h">Relatório do dia</h3>
+        <div class="toolbar">
+          <label>Data <input type="date" id="relData"></label>
+          <button class="btn btn-primary btn-sm" id="btnRelPdf" type="button">📄 Salvar PDF do dia</button>
+          <span class="toolbar-info">O PDF traz vendas, formas de pagamento, tops e o financeiro do dia selecionado.</span>
+        </div>
+        <div class="rel-cards" id="relCards"></div>
+        <div class="grid-2">
+          <div class="card-form">
+            <h4>🏆 Produtos mais vendidos</h4>
+            <div id="relTopProdutos"></div>
+          </div>
+          <div class="card-form">
+            <h4>🧩 Acompanhamentos / opções mais pedidos</h4>
+            <div id="relTopOpcoes"></div>
+          </div>
+        </div>
+        <div class="card-form">
+          <h4>💰 Total por forma de pagamento</h4>
+          <div id="relPorPagamento"></div>
+        </div>
+      </section>
+
+      <!-- FINANCEIRO -->
+      <section id="view-financeiro" class="view hidden">
+        <h3 class="view-h">Financeiro — controle interno e lucro real</h3>
+        <div class="toolbar">
+          <label>Data <input type="date" id="finData"></label>
+          <span class="toolbar-info">Tudo nesta tela (cards, lançamentos e insumos) é do dia selecionado. As vendas do sistema entram sozinhas.</span>
+        </div>
+
+        <div class="rel-cards" id="finCards"></div>
+        <div id="finLucroCard"></div>
+
+        <div class="bloco">
+          <div class="bloco-head"><h3>📒 Lançamentos do dia</h3></div>
+          <p class="dica">Receita manual = dinheiro que entrou fora do sistema (balcão, outro app). Não lance o mesmo valor como investimento <strong>e</strong> como insumo — conte uma vez só, senão o lucro sai errado.</p>
+          <form id="formLancamento" class="fin-form">
+            <div class="fin-tipos" id="finTipos">
+              <button type="button" class="fin-chip chip-investimento sel" data-tipo="investimento">🟣 Investimento</button>
+              <button type="button" class="fin-chip chip-receita" data-tipo="receita_manual">🟢 Receita manual</button>
+              <button type="button" class="fin-chip chip-despesa" data-tipo="despesa">🔴 Despesa</button>
+            </div>
+            <div class="grid-3">
+              <label>Categoria
+                <input type="text" id="finLancCategoria" list="finCategorias" placeholder="Ex.: Combustível" autocomplete="off">
+                <datalist id="finCategorias">
+                  <option value="Combustível"></option>
+                  <option value="Manutenção da moto"></option>
+                  <option value="Embalagens"></option>
+                  <option value="Insumos"></option>
+                  <option value="Aluguel"></option>
+                  <option value="Energia"></option>
+                  <option value="Outros"></option>
+                </datalist>
+              </label>
+              <label>Descrição
+                <input type="text" id="finLancDescricao" placeholder="Ex.: Gasolina da semana" autocomplete="off">
+              </label>
+              <label>Valor (R$)
+                <input type="text" id="finLancValor" class="money" inputmode="numeric" placeholder="0,00">
+              </label>
+            </div>
+            <div class="form-actions">
+              <label class="fin-data-inline">Data <input type="date" id="finLancData"></label>
+              <button type="submit" class="btn btn-primary" id="btnSalvarLancamento">Adicionar lançamento</button>
+              <button type="button" class="btn btn-ghost hidden" id="btnCancelarEdicaoLanc">Cancelar edição</button>
+            </div>
+          </form>
+          <div id="finLancamentosList"></div>
+        </div>
+
+        <div class="bloco">
+          <div class="bloco-head"><h3>🧮 Lucro por Venda — insumos do dia</h3></div>
+          <p class="dica">Lance tudo que foi usado/comprado para vender no dia: pote de açaí, embalagens, morango, leite em pó, leite condensado, gasolina... Cadastrou produto novo no cardápio? As vendas dele entram sozinhas no cálculo — é só lançar os insumos dele aqui.</p>
+          <form id="formInsumo" class="fin-form">
+            <div class="grid-4">
+              <label>Insumo
+                <input type="text" id="finInsumoNome" placeholder="Ex.: Pote de açaí" autocomplete="off" required>
+              </label>
+              <label>Quantidade
+                <input type="text" id="finInsumoQtd" inputmode="decimal" placeholder="Ex.: 5" autocomplete="off" required>
+              </label>
+              <label>Unidade
+                <input type="text" id="finInsumoUnidade" placeholder="kg, un, caixa, pacote" autocomplete="off">
+              </label>
+              <label>Custo total (R$)
+                <input type="text" id="finInsumoCusto" class="money" inputmode="numeric" placeholder="0,00">
+              </label>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Adicionar insumo</button>
+            </div>
+          </form>
+          <div id="finInsumosList"></div>
+
+          <button type="button" class="btn btn-calcular" id="btnCalcularLucro">🧮 CALCULAR LUCRO REAL</button>
+
+          <div id="finResultado" class="fin-resultado hidden">
+            <div class="fin-res-grid">
+              <div class="fin-res-item"><span class="rot">Custo real por copo</span><strong id="finResCustoCopo">—</strong></div>
+              <div class="fin-res-item"><span class="rot">Preço médio por copo</span><strong id="finResPrecoCopo">—</strong></div>
+              <div class="fin-res-item"><span class="rot">Lucro por copo</span><strong id="finResLucroCopo">—</strong></div>
+              <div class="fin-res-item destaque"><span class="rot">Lucro real do dia</span><strong id="finResLucroDia">—</strong></div>
+            </div>
+            <div id="finResDetalhe" class="fin-res-detalhe"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONFIGURAÇÕES -->
+      <section id="view-configuracoes" class="view hidden">
+        <h3 class="view-h">Configurações</h3>
+        <p class="dica">É aqui que você liga os avisos automáticos: o cliente recebe as confirmações no WhatsApp e você (dono) recebe os pedidos no Telegram. Sem configurar, o sistema fica em "modo simulado": registra tudo, mas não envia de verdade.</p>
+
+        <form class="card-form" id="formCfgWhats">
+          <div class="form-row between">
+            <div>
+              <strong>💬 WhatsApp dos clientes (Evolution API)</strong>
+              <div class="dica">Pedido confirmado, "saiu pra entrega" e "entregue" chegam sozinhos no WhatsApp de quem comprou.</div>
+            </div>
+            <span class="cfg-pill sim" id="cfgWhatsPill">Não configurado</span>
+          </div>
+          <div class="form-row between">
+            <div><strong>Avisos por WhatsApp ativos</strong><div class="dica">Desligado = não envia WhatsApp, mesmo com tudo configurado.</div></div>
+            <span class="switch"><input type="checkbox" id="cfgWhatsAtivo" checked><span class="slider"></span></span>
+          </div>
+          <label>Endereço da Evolution API
+            <input type="text" id="cfgWhatsUrl" placeholder="https://seu-servidor:8080" autocomplete="off">
+          </label>
+          <label>Nome da instância
+            <input type="text" id="cfgWhatsInstancia" placeholder="acai-guri" autocomplete="off">
+          </label>
+          <label>Chave de API (apikey)
+            <span class="copy-row">
+              <input type="password" id="cfgWhatsApikey" autocomplete="new-password" placeholder="Cole a chave de API aqui">
+              <button type="button" class="btn btn-ghost btn-sm" data-mostrar="cfgWhatsApikey">👁 Mostrar</button>
+            </span>
+          </label>
+          <p class="campo-dica" id="cfgWhatsApikeyDica">Você encontra a chave no painel da Evolution API (apikey). Ela fica guardada só no servidor.</p>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar WhatsApp</button>
+            <button type="button" class="btn btn-ghost" id="btnCfgWhatsTestar">Salvar e testar conexão</button>
+          </div>
+          <div id="cfgWhatsResult" class="cfg-result hidden"></div>
+
+          <div class="guia">
+            <h4>📖 Como configurar</h4>
+            <ol>
+              <li>Você precisa de um servidor <strong>Evolution API</strong> rodando (instalamos num VPS ou você contrata um provedor que ofereça Evolution pronta).</li>
+              <li>No painel da Evolution, crie uma instância (sugestão de nome: <strong>acai-guri</strong>) e conecte o WhatsApp da loja lendo o QR Code com o celular — igual ao WhatsApp Web.</li>
+              <li>Copie pra cá o <strong>endereço do servidor</strong>, a <strong>chave de API</strong> (apikey) e o <strong>nome da instância</strong>.</li>
+              <li>Salve e teste. Pronto: confirmação, "saiu pra entrega" e "entregue" chegam sozinhos pro cliente. A loja usa o número conectado na instância.</li>
+            </ol>
+          </div>
+        </form>
+
+        <form class="card-form" id="formCfgTelegram">
+          <div class="form-row between">
+            <div>
+              <strong>🤖 Telegram do dono</strong>
+              <div class="dica">Pedido novo cai no seu Telegram e você conduz tudo por lá: Confirmar → Marcar pronto → Saiu pra entrega → Entregue — mesmo estando na rua fazendo entrega.</div>
+            </div>
+            <span class="cfg-pill sim" id="cfgTgPill">Não configurado</span>
+          </div>
+          <div class="form-row between">
+            <div><strong>Avisos por Telegram ativos</strong><div class="dica">Desligado = não envia Telegram, mesmo com tudo configurado.</div></div>
+            <span class="switch"><input type="checkbox" id="cfgTgAtivo" checked><span class="slider"></span></span>
+          </div>
+          <label>Token do bot
+            <span class="copy-row">
+              <input type="password" id="cfgTgToken" autocomplete="new-password" placeholder="Cole o token do bot aqui">
+              <button type="button" class="btn btn-ghost btn-sm" data-mostrar="cfgTgToken">👁 Mostrar</button>
+            </span>
+          </label>
+          <p class="campo-dica" id="cfgTgTokenDica">O token é a sequência longa que o @BotFather devolve quando o bot é criado. Ele fica guardado só no servidor.</p>
+          <label>Seu Chat ID
+            <span class="copy-row">
+              <input type="text" id="cfgTgChatId" placeholder="Ex.: 123456789" autocomplete="off">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnCfgTgDetectar">🔍 Detectar meu chat</button>
+            </span>
+          </label>
+          <div id="cfgTgDetect" class="cfg-result hidden"></div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar Telegram</button>
+            <button type="button" class="btn btn-ghost" id="btnCfgTgTestar">Salvar e testar</button>
+          </div>
+          <div id="cfgTgResult" class="cfg-result hidden"></div>
+
+          <div class="guia">
+            <h4>📖 Como configurar</h4>
+            <ol>
+              <li>No Telegram, converse com o <strong>@BotFather</strong>, envie <strong>/newbot</strong>, escolha nome e usuário do bot — ele devolve um <strong>token</strong> (uma sequência longa). Cole o token aqui.</li>
+              <li>Abra o <strong>seu bot</strong> (link que o BotFather mostra), toque em Começar e mande um "oi".</li>
+              <li>Volte aqui e clique em <strong>Detectar meu chat</strong> — o sistema descobre o número da conversa sozinho. (Se preferir, o @userinfobot também mostra seu ID.)</li>
+              <li>Salve e teste: pedido novo passa a chegar aqui no Telegram com botões que acompanham o pedido até a entrega (Confirmar, Pronto, Saiu pra entrega, Entregue) — mesmo você estando na rua fazendo entrega.</li>
+            </ol>
+          </div>
+        </form>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- Drawer de detalhe do pedido -->
+<div id="drawerOverlay" class="overlay hidden"></div>
+<aside id="drawer" class="drawer hidden">
+  <div class="drawer-head">
+    <h3 id="drawerTitulo">Pedido</h3>
+    <button class="btn btn-ghost btn-sm" id="drawerFechar">✕ Fechar</button>
+  </div>
+  <div id="drawerBody" class="drawer-body"></div>
+</aside>
+
+<!-- Modal genérico -->
+<div id="modalOverlay" class="overlay hidden"></div>
+<div id="modal" class="modal hidden">
+  <div class="modal-head">
+    <h3 id="modalTitulo">—</h3>
+    <button class="btn btn-ghost btn-sm" id="modalFechar">✕</button>
+  </div>
+  <div id="modalBody" class="modal-body"></div>
+</div>
+
+<div id="toasts" class="toasts"></div>
+
+<script src="/painel.js"></script>
+</body>
+</html>

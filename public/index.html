@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#460545">
+<title>Açaí do Guri — Peça online</title>
+<link rel="stylesheet" href="/loja.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%237E047D'/><text x='50' y='66' font-size='52' text-anchor='middle'>🫐</text></svg>">
+</head>
+<body>
+
+<!-- ===== Cabeçalho com transição de cor na rolagem ===== -->
+<header id="hdr">
+  <div class="hwrap">
+    <img id="hdr-logo" class="hlogo" alt="" hidden>
+    <div class="htextos">
+      <span id="hdr-nome" class="hnome">Açaí do Guri</span>
+      <span id="hdr-status" class="hstatus">carregando…</span>
+    </div>
+    <button id="hdr-carrinho" class="hcarrinho" type="button" aria-label="Ver meu pedido">
+      🛒 <span class="hcarrinho-rotulo">Meu pedido</span>
+      <span id="hdr-badge" class="hbadge" hidden>0</span>
+    </button>
+  </div>
+  <div class="haccent"></div>
+</header>
+
+<!-- ===== Visão da loja ===== -->
+<div id="view-loja">
+  <section class="hero">
+    <img id="hero-logo" class="hero-logo" alt="Logo da loja" hidden>
+    <h1 id="hero-nome">Açaí do Guri</h1>
+    <p id="hero-status" class="hero-status"></p>
+    <p id="hero-info" class="hero-info"></p>
+    <div class="hero-links">
+      <a id="hero-insta" class="hero-link" href="#" target="_blank" rel="noopener" hidden>📷 Instagram</a>
+      <a id="hero-zap" class="hero-link" href="#" target="_blank" rel="noopener" hidden>💬 WhatsApp</a>
+    </div>
+  </section>
+
+  <div id="banner-fechada" class="banner-fechada" hidden></div>
+
+  <main class="conteudo">
+    <div class="busca-wrap">
+      <input id="busca" type="search" placeholder="Buscar no cardápio…" autocomplete="off">
+    </div>
+    <nav id="chips" class="chips" aria-label="Categorias"></nav>
+    <div id="cardapio"></div>
+    <p id="sem-resultado" class="sem-resultado" hidden>Nenhum item encontrado para essa busca. 😕</p>
+
+    <footer class="rodape">
+      <p id="rodape-endereco"></p>
+      <p class="rodape-assinatura">Feito com 💜 — peça online e acompanhe seu pedido aqui mesmo.</p>
+    </footer>
+  </main>
+</div>
+
+<!-- ===== Visão de acompanhamento do pedido ===== -->
+<div id="view-pedido" hidden>
+  <main class="conteudo conteudo-pedido">
+    <button id="btn-voltar-loja" class="btn-voltar" type="button">← Voltar ao cardápio</button>
+    <div id="acompanhamento"></div>
+  </main>
+</div>
+
+<!-- ===== Barra fixa do carrinho ===== -->
+<button id="barra-carrinho" class="barra-carrinho" type="button" hidden>
+  <span>🛒 Ver meu pedido</span>
+  <span id="barra-info"></span>
+</button>
+
+<!-- ===== Gaveta do carrinho ===== -->
+<div id="overlay-carrinho" class="overlay" hidden>
+  <div class="sheet sheet-carrinho" role="dialog" aria-modal="true" aria-label="Meu pedido">
+    <div class="sheet-topo">
+      <h2>Meu pedido</h2>
+      <button class="btn-fechar" data-fechar="carrinho" type="button" aria-label="Fechar">✕</button>
+    </div>
+    <div id="carrinho-itens" class="carrinho-itens"></div>
+    <div class="carrinho-rodape">
+      <div class="linha-total"><span>Subtotal</span><strong id="carrinho-subtotal">R$ 0,00</strong></div>
+      <p class="carrinho-obs">A taxa de entrega é calculada na finalização.</p>
+      <button id="btn-ir-checkout" class="btn-primario" type="button">Finalizar pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Montador / detalhe do produto ===== -->
+<div id="overlay-montador" class="overlay" hidden>
+  <div class="sheet sheet-montador" role="dialog" aria-modal="true" aria-label="Montar item">
+    <div class="sheet-topo">
+      <h2 id="montador-titulo">Montar item</h2>
+      <button class="btn-fechar" data-fechar="montador" type="button" aria-label="Fechar">✕</button>
+    </div>
+    <img id="montador-foto" class="montador-foto" alt="" hidden>
+    <p id="montador-desc" class="montador-desc"></p>
+    <div id="montador-grupos" class="montador-grupos"></div>
+    <label class="campo campo-obs">
+      <span>Observação do item</span>
+      <input id="montador-obs" type="text" maxlength="200" placeholder="Ex.: sem leite condensado, capricha na granola…">
+    </label>
+    <div class="montador-rodape">
+      <div class="qtd-controle" aria-label="Quantidade">
+        <button id="montador-menos" type="button" aria-label="Diminuir quantidade">−</button>
+        <span id="montador-qtd">1</span>
+        <button id="montador-mais" type="button" aria-label="Aumentar quantidade">+</button>
+      </div>
+      <button id="montador-adicionar" class="btn-primario" type="button">Adicionar • R$ 0,00</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Checkout ===== -->
+<div id="overlay-checkout" class="overlay" hidden>
+  <div class="sheet sheet-checkout" role="dialog" aria-modal="true" aria-label="Finalizar pedido">
+    <div class="sheet-topo">
+      <h2>Finalizar pedido</h2>
+      <button class="btn-fechar" data-fechar="checkout" type="button" aria-label="Fechar">✕</button>
+    </div>
+
+    <form id="form-checkout" novalidate>
+      <fieldset class="grupo-form">
+        <legend>Seus dados</legend>
+        <label class="campo">
+          <span>Seu nome *</span>
+          <input id="ck-nome" type="text" autocomplete="name" maxlength="80" placeholder="Como podemos te chamar?">
+        </label>
+        <label class="campo">
+          <span>WhatsApp *</span>
+          <input id="ck-whats" type="tel" autocomplete="tel" inputmode="tel" maxlength="16" placeholder="(47) 99999-9999">
+        </label>
+      </fieldset>
+
+      <fieldset class="grupo-form">
+        <legend>Como quer receber?</legend>
+        <div class="segmentado" id="ck-tipo">
+          <button type="button" data-tipo="entrega" class="seg-ativo">🛵 Entrega</button>
+          <button type="button" data-tipo="retirada">🏃 Retirada</button>
+        </div>
+        <div id="ck-endereco">
+          <label class="campo">
+            <span>Bairro *</span>
+            <select id="ck-bairro"></select>
+          </label>
+          <div class="linha-campos">
+            <label class="campo campo-rua">
+              <span>Rua *</span>
+              <input id="ck-rua" type="text" autocomplete="street-address" maxlength="120" placeholder="Nome da rua">
+            </label>
+            <label class="campo campo-numero">
+              <span>Número *</span>
+              <input id="ck-numero" type="text" inputmode="numeric" maxlength="12" placeholder="123">
+            </label>
+          </div>
+          <label class="campo">
+            <span>Complemento</span>
+            <input id="ck-complemento" type="text" maxlength="80" placeholder="Apto, bloco, casa…">
+          </label>
+          <label class="campo">
+            <span>Ponto de referência</span>
+            <input id="ck-referencia" type="text" maxlength="120" placeholder="Perto de onde? Portão de que cor?">
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="grupo-form">
+        <legend>Pagamento</legend>
+        <div id="ck-pagamentos" class="pagamentos"></div>
+        <label class="campo" id="ck-troco-wrap" hidden>
+          <span>Troco para quanto?</span>
+          <input id="ck-troco" type="text" inputmode="decimal" placeholder="Ex.: 100,00 (vazio = sem troco)">
+        </label>
+        <p id="ck-pag-online-aviso" class="pag-online-aviso" hidden>Pagamento online: após confirmar, você recebe o QR Pix ou o link para pagar. Seu pedido já fica reservado. 💜</p>
+      </fieldset>
+
+      <label class="campo campo-obs-geral">
+        <span>Observação do pedido</span>
+        <input id="ck-obs" type="text" maxlength="200" placeholder="Algum recado pra gente? (opcional)">
+      </label>
+
+      <div class="resumo">
+        <div class="resumo-linha"><span>Subtotal</span><span id="rs-subtotal">R$ 0,00</span></div>
+        <div class="resumo-linha"><span>Taxa de entrega</span><span id="rs-taxa">—</span></div>
+        <div class="resumo-linha resumo-total"><span>TOTAL</span><strong id="rs-total">R$ 0,00</strong></div>
+        <p id="rs-minimo" class="rs-minimo" hidden></p>
+      </div>
+
+      <p id="ck-erro" class="erro-form" hidden></p>
+      <button id="btn-confirmar" class="btn-primario btn-confirmar" type="submit">Confirmar pedido</button>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="/loja.js"></script>
+</body>
+</html>

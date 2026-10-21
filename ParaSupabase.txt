@@ -1,0 +1,3 @@
+Link até 23/10, 02:08. ⚠️ Nesta versão rode npm install depois de extrair (entrou a dependência do Postgres). Seus dados locais ficam intactos.
+
+Quando você mandar subir, o caminho é curto: criar o projeto no Supabase → colar o supabase/schema.sql no SQL Editor → pegar a connection string → colocar como DATABASE_URL na Vercel. Só fica faltando, pra produção completa, as fotos dos produtos irem pro Supabase Storage (hoje ficam em disco local) — é o próximo passo quando você quiser.
